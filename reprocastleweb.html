@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <script id='sonic_js' data-port='8008' src='https://sonic.sistemahost.es/cp/widgets.js?r=123'></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CASTLE Player</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Exo+2:wght@300;400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0a0f;
+      --blue: #00f3ff;
+      --red: #ff0055;
+      --pink-neon: #ff00c8;
+      --green-neon: #05ffa0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--black);
+      color: #eee;
+      font-family: 'Exo 2', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .castle-player {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .cyberdeck {
+      width: 100%;
+      background: rgba(4, 4, 12, 0.7);
+      border: 1px solid var(--blue);
+      border-radius: 4px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.5), inset 0 0 12px rgba(0, 10, 20, 0.6);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(0, 200, 255, 0.2);
+      padding-bottom: 6px;
+    }
+
+    .status {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green-neon);
+      box-shadow: 0 0 6px var(--green-neon);
+      animation: blink-green 1.8s infinite;
+    }
+    @keyframes blink-green { 0%, 90% { opacity: 1; } 95%, 100% { opacity: 0.2; } }
+
+    .song-info {
+      min-height: 60px;
+      max-height: 84px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 14px 0;
+      padding: 8px 10px;
+      background: rgba(0, 5, 15, 0.4);
+      border-radius: 4px;
+      overflow: hidden;
+      width: 100%;
+      border: 1px solid rgba(0, 150, 200, 0.25);
+      box-shadow: inset 0 0 10px rgba(0, 10, 20, 0.6);
+    }
+
+    #sonic_art {
+      width: 56px;
+      height: 56px;
+      border-radius: 4px;
+      background: rgba(0, 10, 20, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 6px rgba(0, 200, 255, 0.5);
+      border: 1px solid rgba(0, 200, 255, 0.35);
+      flex-shrink: 0;
+      animation: pulse-border 2.5s infinite alternate;
+    }
+
+    #sonic_art::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 1px,
+        rgba(0, 30, 50, 0.5) 1px,
+        rgba(0, 30, 50, 0.5) 2px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #sonic_art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: contrast(1.3) brightness(1.15);
+    }
+
+    #sonic_art.is-loading img {
+      filter: grayscale(1) contrast(0.6);
+      opacity: 0.2;
+    }
+
+    #sonic_title {
+      flex: 1;
+      min-width: 0;
+      font-size: 15px;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--blue);
+      line-height: 1.35;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      overflow: hidden;
+    }
+
+    .cyber-glitch {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .cyber-glitch::before,
+    .cyber-glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .cyber-glitch::before {
+      color: var(--pink-neon);
+      clip-path: inset(2px 0 11px 0);
+      animation: glitch-shift-1 2.0s infinite;
+      z-index: -1;
+    }
+
+    .cyber-glitch::after {
+      color: var(--green-neon);
+      clip-path: inset(10px 0 3px 0);
+      animation: glitch-shift-2 2.7s infinite;
+      z-index: -2;
+    }
+
+    .cyber-glitch.flash {
+      animation: glitch-flash 1s 1;
+    }
+
+    .cyber-glitch.pulse {
+      animation: glitch-pulse 1s 1;
+    }
+
+    .cyber-glitch.chaos {
+      animation: glitch-chaos 1s 1;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 8px rgba(0, 200, 255, 0.6); }
+      50% { box-shadow: 0 0 20px rgba(0, 243, 255, 1.0), 0 0 36px rgba(0, 255, 255, 0.6); }
+    }
+
+    @keyframes glitch-shift-1 {
+      0%, 100% { clip-path: inset(2px 0 11px 0); transform: translate(0, 0) rotate(0); }
+      6%  { clip-path: inset(0px 0 15px 0); transform: translate(-5px, 3px) rotate(1.5deg); }
+      12% { clip-path: inset(6px 0 6px 0); transform: translate(5px, -3px) rotate(-1.2deg) scaleX(1.03); }
+      18% { clip-path: inset(1px 0 13px 0); transform: translate(-4px, 4px) rotate(2deg); }
+      24% { clip-path: inset(4px 0 9px 0); transform: translate(4px, -2px) skewX(2deg); }
+      30% { clip-path: inset(3px 0 10px 0); transform: translate(-3px, 1px) scaleX(0.97); }
+    }
+
+    @keyframes glitch-shift-2 {
+      0%, 100% { clip-path: inset(10px 0 3px 0); transform: translate(0, 0) rotate(0); }
+      10% { clip-path: inset(6px 0 7px 0); transform: translate(5px, -4px) rotate(-2deg) scaleY(1.05); }
+      20% { clip-path: inset(14px 0 -1px 0); transform: translate(-5px, 3px) rotate(1.8deg); }
+      30% { clip-path: inset(4px 0 9px 0); transform: translate(-3px, -4px) skewY(3deg); }
+      40% { clip-path: inset(12px 0 1px 0); transform: translate(4px, 2px) scaleX(1.04); }
+      50% { clip-path: inset(8px 0 5px 0); transform: translate(0, -2px); }
+    }
+
+    @keyframes glitch-flash {
+      0%   { text-shadow: 0 0 8px var(--blue); opacity: 1; }
+      15%  { text-shadow: 0 0 24px rgba(0, 255, 255, 1.0), 0 0 38px rgba(0, 247, 255, 1.0); }
+      30%  { text-shadow: 0 0 28px rgba(255, 0, 200, 0.9), 0 0 42px rgba(5, 255, 160, 0.8); }
+      45%  { text-shadow: 0 0 0 transparent; opacity: 0.2; }
+      60%  { text-shadow: 0 0 30px rgba(0, 255, 255, 1.0), 0 0 46px rgba(255, 0, 200, 0.8); opacity: 1; }
+      100% { text-shadow: none; opacity: 1; }
+    }
+
+    @keyframes glitch-pulse {
+      0%   { text-shadow: 0 0 10px var(--blue); }
+      25%  { text-shadow: 0 0 26px rgba(0, 255, 255, 1.0), 0 0 40px rgba(0, 247, 255, 0.95); }
+      50%  { text-shadow: 0 0 0 transparent; opacity: 0.1; }
+      75%  { text-shadow: 0 0 32px rgba(5, 255, 160, 0.9), 0 0 50px rgba(255, 0, 200, 0.7); }
+      100% { text-shadow: none; opacity: 1; }
+    }
+
+    @keyframes glitch-chaos {
+      0%   { text-shadow: 0 0 10px var(--blue); transform: translate(0,0) rotate(0); }
+      10%  { text-shadow: 0 0 28px rgba(0, 255, 255, 1.0); transform: translate(-4px, 2px) rotate(2deg); }
+      20%  { text-shadow: 0 0 0 transparent; opacity: 0.05; transform: translate(0,0); }
+      30%  { text-shadow: 0 0 34px rgba(255, 0, 200, 0.9); transform: translate(5px, -3px) skewX(4deg); }
+      40%  { text-shadow: 0 0 0 transparent; opacity: 0.1; }
+      50%  { text-shadow: 0 0 40px rgba(5, 255, 160, 0.95); transform: translate(-3px, 4px) scaleX(1.05); }
+      60%  { text-shadow: 0 0 0 transparent; opacity: 0.05; }
+      70%  { text-shadow: 0 0 36px rgba(0, 247, 255, 1.0); transform: translate(2px, -2px) rotate(-3deg); }
+      80%  { text-shadow: 0 0 0 transparent; opacity: 0.2; }
+      90%  { text-shadow: 0 0 30px rgba(0, 255, 255, 0.9); }
+      100% { text-shadow: none; transform: translate(0,0) rotate(0); opacity: 1; }
+    }
+
+    .fft-visualizer {
+      height: 46px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin: 0 auto 12px;
+      padding: 0 6px;
+      background: 
+        linear-gradient(rgba(0,60,100,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,60,100,0.08) 1px, transparent 1px),
+        rgba(0, 5, 15, 0.4);
+      background-size: 10px 10px;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      border: 1px solid rgba(0, 150, 200, 0.2);
+      box-shadow: inset 0 0 8px rgba(0, 10, 20, 0.5);
+    }
+
+    .fft-bar {
+      width: 4px;
+      border-radius: 2px 2px 0 0;
+      position: relative;
+      transform-origin: bottom;
+      transition: height 0.015s cubic-bezier(0.1, 0.9, 0.2, 1);
+      box-shadow: 0 0 5px rgba(0, 200, 255, 0.7);
+    }
+
+    .fft-bar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top,
+        #002266,
+        #0055aa 40%,
+        var(--blue) 70%,
+        #bbffff
+      );
+      border-radius: 2px 2px 0 0;
+    }
+
+    .fft-bar.overload::before {
+      background: linear-gradient(to top,
+        var(--pink-neon),
+        #ff004d 30%,
+        var(--green-neon) 60%,
+        #00ddff
+      );
+      box-shadow: 
+        0 0 14px rgba(0, 255, 255, 1.0), 
+        0 0 24px rgba(5, 255, 160, 0.8),
+        0 0 40px rgba(255, 0, 200, 0.7);
+    }
+
+    .one-btn {
+      width: 100%;
+      height: 56px;
+      background: rgba(1, 3, 12, 0.8);
+      border: 2px solid var(--blue);
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .one-btn:hover {
+      background: rgba(2, 8, 20, 0.9);
+    }
+
+    .one-btn:active {
+      background: rgba(0, 20, 60, 0.8);
+      box-shadow: 0 0 20px var(--blue), inset 0 0 14px rgba(0, 200, 255, 0.6);
+      transform: scale(0.96);
+    }
+
+    .one-btn.playing {
+      background: rgba(2, 12, 8, 0.8);
+      border-color: var(--green-neon);
+      box-shadow: 0 0 18px rgba(5, 255, 160, 0.8);
+    }
+
+    .volume {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .volume label {
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--blue);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .slider {
+      flex: 1; height: 5px; -webkit-appearance: none;
+      background: rgba(0, 40, 80, 0.6);
+      border-radius: 3px;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px;
+      border-radius: 50%; background: var(--blue);
+      border: 2px solid #000;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 1.0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="castle-player">
+    <div class="cyberdeck">
+      <div class="hud">
+        <div class="status">
+          <div class="dot"></div>
+          <div style="color:var(--blue); font-size:12px; font-family:'Share Tech Mono'">CASTLE RADIO</div>
+        </div>
+      </div>
+
+      <div class="song-info">
+        <div id="sonic_art">
+          <div style="width:100%;height:100%;background:rgba(0,20,40,0.5);display:flex;align-items:center;justify-content:center;font-size:10px;color:#00ccff;">NO ART</div>
+        </div>
+        <div id="sonic_title" class="cyber-glitch" data-text="— AWAITING SIGNAL —">— AWAITING SIGNAL —</div>
+      </div>
+
+      <div class="fft-visualizer" id="visualizer"></div>
+
+      <button id="toggleBtn" class="one-btn">▷ PLAY SYSTEM</button>
+
+      <div class="volume">
+        <label>VOL</label>
+        <input type="range" class="slider" id="volSlider" min="0" max="1" step="0.01" value="1.0">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const STREAM_URL = 'https://corsproxy.io/?https://sonic.sistemahost.es/8008/stream';
+      let audio = null;
+      let audioContext = null;
+      let analyser = null;
+      let dataArray = null;
+      let isPlaying = false;
+      let periodicGlitchInterval = null;
+      let randomGlitchInterval = null;
+      let lastGlitchTime = 0;
+
+      const toggleBtn = document.getElementById('toggleBtn');
+      const volSlider = document.getElementById('volSlider');
+      const visualizer = document.getElementById('visualizer');
+      const sonicArt = document.getElementById('sonic_art');
+      const sonicTitle = document.getElementById('sonic_title');
+
+      const barCount = 32;
+      const bars = [];
+      for (let i = 0; i < barCount; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'fft-bar';
+        bar.style.height = '2px';
+        visualizer.appendChild(bar);
+        bars.push(bar);
+      }
+
+      async function initAudio() {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        audio = new Audio(STREAM_URL);
+        audio.crossOrigin = 'anonymous';
+        audio.volume = parseFloat(volSlider.value);
+
+        const source = audioContext.createMediaElementSource(audio);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+      }
+
+      function animateFFT() {
+        if (!isPlaying || !analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+
+        // Energía en graves (para efectos visuales futuros si se añaden láseres)
+        let bassEnergy = 0;
+        for (let i = 0; i < 6; i++) {
+          bassEnergy += dataArray[i];
+        }
+        const bassAvg = bassEnergy / 6;
+
+        // Actualizar visualizador
+        const step = Math.floor(dataArray.length / barCount);
+        for (let i = 0; i < barCount; i++) {
+          let sum = 0;
+          for (let j = i * step; j < (i + 1) * step && j < dataArray.length; j++) {
+            sum += dataArray[j];
+          }
+          const avg = sum / step;
+          const height = Math.max(2, (avg / 255) * 44);
+          bars[i].classList.toggle('overload', height > 38);
+          bars[i].style.height = `${height}px`;
+        }
+
+        requestAnimationFrame(animateFFT);
+      }
+
+      function triggerGlitch(type = 'pulse') {
+        const now = Date.now();
+        if ((now - lastGlitchTime) < 3000) return;
+        lastGlitchTime = now;
+
+        const text = sonicTitle.textContent.trim() || '— AWAITING SIGNAL —';
+        sonicTitle.setAttribute('data-text', text);
+
+        const r = Math.random();
+        let effect = 'pulse';
+        if (r < 0.3) effect = 'flash';
+        else if (r < 0.4) effect = 'chaos';
+
+        sonicTitle.classList.add(effect);
+        setTimeout(() => sonicTitle.classList.remove(effect), 1000);
+      }
+
+      function startPeriodicGlitch() {
+        if (periodicGlitchInterval) clearInterval(periodicGlitchInterval);
+        periodicGlitchInterval = setInterval(() => {
+          if (isPlaying) triggerGlitch('pulse');
+        }, 15000);
+      }
+
+      function startRandomGlitch() {
+        if (randomGlitchInterval) clearInterval(randomGlitchInterval);
+        const next = 5000 + Math.random() * 7000;
+        randomGlitchInterval = setTimeout(() => {
+          if (isPlaying) {
+            triggerGlitch();
+            startRandomGlitch();
+          }
+        }, next);
+      }
+
+      function stopAllGlitches() {
+        if (periodicGlitchInterval) clearInterval(periodicGlitchInterval);
+        if (randomGlitchInterval) clearTimeout(randomGlitchInterval);
+        periodicGlitchInterval = null;
+        randomGlitchInterval = null;
+      }
+
+      toggleBtn.onclick = async () => {
+        if (!audioContext) await initAudio();
+
+        if (isPlaying) {
+          audio.pause();
+          isPlaying = false;
+          toggleBtn.classList.remove('playing');
+          toggleBtn.textContent = '▷ PLAY SYSTEM';
+          bars.forEach(bar => bar.style.height = '2px');
+          stopAllGlitches();
+        } else {
+          try {
+            if (audioContext.state === 'suspended') await audioContext.resume();
+            await audio.play();
+            isPlaying = true;
+            toggleBtn.classList.add('playing');
+            toggleBtn.textContent = '▮ STOP SYSTEM';
+            animateFFT();
+            startPeriodicGlitch();
+            startRandomGlitch();
+          } catch (e) {
+            console.error('Reproducción fallida:', e);
+            alert('⚠️ No se pudo reproducir el stream. Verifica conexión o CORS.');
+          }
+        }
+      };
+
+      volSlider.oninput = () => {
+        if (audio) audio.volume = parseFloat(volSlider.value);
+      };
+
+      // Sincronizar data-text al inicio
+      function syncGlitch() {
+        const text = sonicTitle.textContent.trim() || '— AWAITING SIGNAL —';
+        sonicTitle.setAttribute('data-text', text);
+      }
+      syncGlitch();
+
+      // Observar cambios del título (widgets.js lo actualiza)
+      const titleObserver = new MutationObserver(() => {
+        const currentText = sonicTitle.textContent.trim();
+        const oldText = sonicTitle.getAttribute('data-text') || '';
+        if (currentText && currentText !== oldText) {
+          sonicTitle.setAttribute('data-text', currentText);
+          sonicTitle.classList.add('flash');
+          setTimeout(() => sonicTitle.classList.remove('flash'), 1000);
+          lastGlitchTime = Date.now();
+        }
+      });
+      titleObserver.observe(sonicTitle, { childList: true, subtree: true, characterData: true });
+
+      // Observar cambios en el arte
+      const artObserver = new MutationObserver(() => {
+        sonicArt.classList.toggle('is-loading', !sonicArt.querySelector('img'));
+      });
+      artObserver.observe(sonicArt, { childList: true, subtree: true });
+    });
+  </script>
+</body>
+</html>
