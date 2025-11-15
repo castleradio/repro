@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <script id='sonic_js' data-port='8008' src='https://sonic.sistemahost.es/cp/widgets.js?r=123'></script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CASTLE Player</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Exo+2:wght@300;400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>CASTLE</title>
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Exo+2:wght@300;400&family=Share+Tech+Mono&family=Material+Icons+Outlined&display=swap" rel="stylesheet">
   <style>
     :root {
       --black: #0a0a0f;
@@ -25,16 +25,45 @@
       background: var(--black);
       color: #eee;
       font-family: 'Exo 2', sans-serif;
+      min-height: 100svh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      position: relative;
+      padding: 1rem;
+    }
+
+    .scanlines {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.15),
+        rgba(0,0,0,0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    .noise-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url("image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: -1;
     }
 
     .castle-player {
       width: 100%;
       max-width: 440px;
+      margin: 0;
+      padding: 0 1rem;
     }
 
     .cyberdeck {
@@ -73,8 +102,9 @@
     @keyframes blink-green { 0%, 90% { opacity: 1; } 95%, 100% { opacity: 0.2; } }
 
     .song-info {
-      min-height: 60px;
-      max-height: 84px;
+      /* ✅ Aún más alto: +12px total */
+      min-height: 72px;
+      max-height: 96px;
       height: auto;
       display: flex;
       align-items: center;
@@ -85,8 +115,7 @@
       border-radius: 4px;
       overflow: hidden;
       width: 100%;
-      border: 1px solid rgba(0, 150, 200, 0.25);
-      box-shadow: inset 0 0 10px rgba(0, 10, 20, 0.6);
+      position: relative;
     }
 
     #sonic_art {
@@ -100,7 +129,6 @@
       overflow: hidden;
       position: relative;
       box-shadow: 0 0 6px rgba(0, 200, 255, 0.5);
-      border: 1px solid rgba(0, 200, 255, 0.35);
       flex-shrink: 0;
       animation: pulse-border 2.5s infinite alternate;
     }
@@ -118,6 +146,31 @@
       );
       pointer-events: none;
       z-index: 2;
+    }
+
+    #sonic_art::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='distort'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02' numOctaves='1'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='8' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23distort)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 1;
+      animation: horizontal-jitter 4s infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 8px rgba(0, 200, 255, 0.6); }
+      50% { box-shadow: 0 0 20px rgba(0, 243, 255, 1.0), 0 0 36px rgba(0, 255, 255, 0.6); }
+    }
+
+    @keyframes horizontal-jitter {
+      0%, 100% { transform: translateX(0); }
+      8%  { transform: translateX(-3px) rotate(0.8deg); }
+      16% { transform: translateX(3px) rotate(-0.6deg); }
+      24% { transform: translateX(-2px) rotate(1.2deg); }
+      32% { transform: translateX(2.5px) rotate(-1deg); }
+      40% { transform: translateX(-1.5px); }
     }
 
     #sonic_art img {
@@ -140,10 +193,15 @@
       font-family: 'Share Tech Mono', monospace;
       color: var(--blue);
       line-height: 1.35;
+      position: relative;
       white-space: normal;
       overflow-wrap: break-word;
       word-break: break-word;
       overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
     }
 
     .cyber-glitch {
@@ -161,6 +219,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
+      text-align: center;
     }
 
     .cyber-glitch::before {
@@ -187,11 +246,6 @@
 
     .cyber-glitch.chaos {
       animation: glitch-chaos 1s 1;
-    }
-
-    @keyframes pulse-border {
-      0%, 100% { box-shadow: 0 0 8px rgba(0, 200, 255, 0.6); }
-      50% { box-shadow: 0 0 20px rgba(0, 243, 255, 1.0), 0 0 36px rgba(0, 255, 255, 0.6); }
     }
 
     @keyframes glitch-shift-1 {
@@ -259,8 +313,6 @@
       position: relative;
       overflow: hidden;
       width: 100%;
-      border: 1px solid rgba(0, 150, 200, 0.2);
-      box-shadow: inset 0 0 8px rgba(0, 10, 20, 0.5);
     }
 
     .fft-bar {
@@ -333,15 +385,24 @@
     .volume {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 12px;
+      margin-top: 12px;
     }
 
-    .volume label {
-      font-size: 11px;
-      letter-spacing: 1px;
+    .volume-icon {
+      font-family: 'Material Icons Outlined';
+      font-size: 24px;
       color: var(--blue);
-      font-family: 'Share Tech Mono', monospace;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .volume-icon.mute {
+      color: var(--red);
+    }
+
+    .volume-icon:hover {
+      text-shadow: 0 0 8px currentColor;
     }
 
     .slider {
@@ -357,9 +418,28 @@
       cursor: pointer;
       box-shadow: 0 0 10px rgba(0, 243, 255, 1.0);
     }
+
+    @media (max-width: 768px) {
+      .castle-player { padding: 0 1rem; max-width: 94vw; }
+      .cyberdeck { padding: 20px; font-size: 14.5px; }
+      .song-info { min-height: 72px; max-height: 96px; padding: 8px 12px; }
+      #sonic_art { width: 56px; height: 56px; }
+      #sonic_title { font-size: 15px; }
+    }
+
+    @media (max-width: 480px) {
+      .cyberdeck { padding: 18px; font-size: 14px; }
+      .song-info { min-height: 68px; max-height: 92px; gap: 12px; padding: 8px 10px; }
+      #sonic_art { width: 52px; height: 52px; }
+      #sonic_title { font-size: 14px; line-height: 1.35; }
+      .one-btn { height: 60px; font-size: 16px; }
+    }
   </style>
 </head>
 <body>
+
+  <div class="scanlines"></div>
+  <div class="noise-overlay"></div>
 
   <div class="castle-player">
     <div class="cyberdeck">
@@ -382,15 +462,18 @@
       <button id="toggleBtn" class="one-btn">▷ PLAY SYSTEM</button>
 
       <div class="volume">
-        <label>VOL</label>
+        <div class="volume-icon mute" id="muteBtn">volume_mute</div>
         <input type="range" class="slider" id="volSlider" min="0" max="1" step="0.01" value="1.0">
+        <div class="volume-icon" id="maxVolBtn">volume_up</div>
       </div>
     </div>
   </div>
 
+  <script id='sonic_js' data-port='8008' src='https://sonic.sistemahost.es/cp/widgets.js?r=477'></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const STREAM_URL = 'https://corsproxy.io/?https://sonic.sistemahost.es/8008/stream';
+      const STREAM_URL = 'https://sonic.sistemahost.es/8008/stream';
       let audio = null;
       let audioContext = null;
       let analyser = null;
@@ -402,6 +485,8 @@
 
       const toggleBtn = document.getElementById('toggleBtn');
       const volSlider = document.getElementById('volSlider');
+      const muteBtn = document.getElementById('muteBtn');
+      const maxVolBtn = document.getElementById('maxVolBtn');
       const visualizer = document.getElementById('visualizer');
       const sonicArt = document.getElementById('sonic_art');
       const sonicTitle = document.getElementById('sonic_title');
@@ -416,12 +501,32 @@
         bars.push(bar);
       }
 
-      async function initAudio() {
-        if (!audioContext) {
-          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      function destroyAudio() {
+        if (audio) {
+          audio.pause();
+          audio.src = '';
+          audio.load();
+          audio = null;
         }
-        audio = new Audio(STREAM_URL);
+        if (analyser) {
+          analyser.disconnect();
+          analyser = null;
+        }
+        if (audioContext) {
+          audioContext = null;
+        }
+        isPlaying = false;
+      }
+
+      async function initAudio() {
+        if (isPlaying) {
+          destroyAudio();
+        }
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audio = new Audio();
         audio.crossOrigin = 'anonymous';
+        audio.src = STREAM_URL;
         audio.volume = parseFloat(volSlider.value);
 
         const source = audioContext.createMediaElementSource(audio);
@@ -438,14 +543,6 @@
         if (!isPlaying || !analyser) return;
         analyser.getByteFrequencyData(dataArray);
 
-        // Energía en graves (para efectos visuales futuros si se añaden láseres)
-        let bassEnergy = 0;
-        for (let i = 0; i < 6; i++) {
-          bassEnergy += dataArray[i];
-        }
-        const bassAvg = bassEnergy / 6;
-
-        // Actualizar visualizador
         const step = Math.floor(dataArray.length / barCount);
         for (let i = 0; i < barCount; i++) {
           let sum = 0;
@@ -504,18 +601,18 @@
       }
 
       toggleBtn.onclick = async () => {
-        if (!audioContext) await initAudio();
-
         if (isPlaying) {
-          audio.pause();
-          isPlaying = false;
+          destroyAudio();
           toggleBtn.classList.remove('playing');
           toggleBtn.textContent = '▷ PLAY SYSTEM';
           bars.forEach(bar => bar.style.height = '2px');
           stopAllGlitches();
         } else {
           try {
-            if (audioContext.state === 'suspended') await audioContext.resume();
+            await initAudio();
+            if (audioContext.state === 'suspended') {
+              await audioContext.resume();
+            }
             await audio.play();
             isPlaying = true;
             toggleBtn.classList.add('playing');
@@ -525,7 +622,7 @@
             startRandomGlitch();
           } catch (e) {
             console.error('Reproducción fallida:', e);
-            alert('⚠️ No se pudo reproducir el stream. Verifica conexión o CORS.');
+            destroyAudio();
           }
         }
       };
@@ -534,14 +631,28 @@
         if (audio) audio.volume = parseFloat(volSlider.value);
       };
 
-      // Sincronizar data-text al inicio
+      muteBtn.onclick = () => {
+        volSlider.value = 0;
+        if (audio) audio.volume = 0;
+      };
+
+      maxVolBtn.onclick = () => {
+        volSlider.value = 1.0;
+        if (audio) audio.volume = 1.0;
+      };
+
       function syncGlitch() {
         const text = sonicTitle.textContent.trim() || '— AWAITING SIGNAL —';
         sonicTitle.setAttribute('data-text', text);
       }
       syncGlitch();
+      let attempts = 0;
+      const initInterval = setInterval(() => {
+        syncGlitch();
+        attempts++;
+        if (attempts > 20) clearInterval(initInterval);
+      }, 70);
 
-      // Observar cambios del título (widgets.js lo actualiza)
       const titleObserver = new MutationObserver(() => {
         const currentText = sonicTitle.textContent.trim();
         const oldText = sonicTitle.getAttribute('data-text') || '';
@@ -554,7 +665,6 @@
       });
       titleObserver.observe(sonicTitle, { childList: true, subtree: true, characterData: true });
 
-      // Observar cambios en el arte
       const artObserver = new MutationObserver(() => {
         sonicArt.classList.toggle('is-loading', !sonicArt.querySelector('img'));
       });
