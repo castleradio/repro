@@ -15,7 +15,7 @@
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-focus: rgba(255, 0, 60, 0.4);
       --skz-crimson: #ff003c;
-      --skz-glow: rgba(255, 0, 60, 0.4);
+      --skz-glow: rgba(255, 0, 60, 0.45);
       --accent-cyan: #00f0ff;
       --text-primary: #ffffff;
       --text-secondary: #9499ad;
@@ -41,8 +41,8 @@
 
     body {
       background-image: 
-        radial-gradient(circle at 15% 0%, rgba(255, 0, 60, 0.14) 0%, transparent 50%),
-        radial-gradient(circle at 85% 100%, rgba(0, 240, 255, 0.08) 0%, transparent 45%);
+        radial-gradient(circle at 15% 0%, rgba(255, 0, 60, 0.16) 0%, transparent 50%),
+        radial-gradient(circle at 85% 100%, rgba(0, 240, 255, 0.1) 0%, transparent 45%);
       display: flex;
       flex-direction: column;
     }
@@ -119,9 +119,9 @@
     .workspace {
       flex: 1;
       display: grid;
-      grid-template-columns: 480px 1fr;
+      grid-template-columns: 500px 1fr;
       gap: 24px;
-      padding: 20px 32px 24px 32px;
+      padding: 16px 32px 20px 32px;
       height: calc(100vh - 60px);
       min-height: 0;
     }
@@ -132,7 +132,7 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border-subtle);
       border-radius: 24px;
-      padding: 24px 28px 20px 28px;
+      padding: 20px 24px 18px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -148,26 +148,27 @@
       width: 100%;
     }
 
-    /* CARÁTULA GRANDE */
+    /* CARÁTULA GIGANTE QUE OCUPA CASI TODO EL ANCHO */
     .cover-wrapper {
-      width: min(320px, 36vh);
-      height: min(320px, 36vh);
-      border-radius: 24px;
-      margin-bottom: 14px;
+      width: 100%;
+      max-width: 420px;
+      height: min(340px, 39vh);
+      border-radius: 20px;
+      margin-bottom: 12px;
       position: relative;
-      background: #141722;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+      background: #0d0f17;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8);
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .cover-img {
       width: 100%;
       height: 100%;
-      border-radius: 24px;
+      border-radius: 20px;
       object-fit: cover;
       transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
@@ -182,23 +183,23 @@
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--accent-cyan);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .title-marquee-container {
       width: 100%;
-      max-width: 400px;
+      max-width: 440px;
       overflow: hidden;
       position: relative;
       display: flex;
       justify-content: center;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
       -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
     }
 
     .meta-title {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 800;
       white-space: nowrap;
       display: inline-block;
@@ -215,7 +216,7 @@
     }
 
     .meta-artist {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-secondary);
       font-weight: 500;
     }
@@ -224,17 +225,17 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
-    /* ECUALIZADOR DINÁMICO */
+    /* ECUALIZADOR DINÁMICO EXPANDIDO */
     .equalizer-canvas-container {
       width: 100%;
-      height: 52px;
+      height: 64px;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      margin-bottom: -2px;
+      margin-bottom: -4px;
     }
 
     #equalizerCanvas {
@@ -243,7 +244,6 @@
       display: block;
     }
 
-    /* TIMELINE DESLIZABLE (SCRUBBER) */
     .timeline {
       width: 100%;
     }
@@ -293,7 +293,7 @@
       font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
-      margin-top: 6px;
+      margin-top: 5px;
       font-variant-numeric: tabular-nums;
     }
 
@@ -341,8 +341,8 @@
       background: linear-gradient(135deg, var(--skz-crimson), #e60036);
       border: none;
       color: white;
-      width: 60px;
-      height: 60px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -577,7 +577,10 @@
       }
       .player-deck {
         height: auto;
-        gap: 20px;
+        gap: 16px;
+      }
+      .cover-wrapper {
+        height: 300px;
       }
       .library-panel {
         height: 600px;
@@ -608,8 +611,8 @@
     <section class="player-deck" id="playerDeck">
       <div class="deck-top">
         <div class="cover-wrapper">
-          <!-- Portada de Stray Kids oficial de bienvenida (ATE) -->
-          <img src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/44/e9/87/44e98797-e898-751d-eb83-3c22b936d908/196872134440.jpg/600x600bb.jpg" 
+          <!-- Portada Vectorial Oficial SKZ en SVG puro (nunca falla ni queda en blanco) -->
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231a0308'/><stop offset='50%25' stop-color='%2308090d'/><stop offset='100%25' stop-color='%23020b12'/></linearGradient><linearGradient id='glow' x1='0%25' y1='0%25' x2='100%25' y2='0%25'><stop offset='0%25' stop-color='%23ff003c'/><stop offset='100%25' stop-color='%2300f0ff'/></linearGradient></defs><rect width='600' height='600' fill='url(%23g)'/><circle cx='300' cy='300' r='230' stroke='%23ff003c' stroke-width='3' fill='none' opacity='0.25'/><circle cx='300' cy='300' r='180' stroke='%2300f0ff' stroke-width='2' stroke-dasharray='8 6' fill='none' opacity='0.3'/><path d='M230 200 L370 200 L390 230 L210 230 Z' fill='%23ff003c' opacity='0.8'/><text x='300' y='325' font-family='sans-serif' font-weight='900' font-size='56' fill='%23ffffff' text-anchor='middle' letter-spacing='4'>STRAY KIDS</text><text x='300' y='365' font-family='sans-serif' font-weight='800' font-size='22' fill='url(%23glow)' text-anchor='middle' letter-spacing='10'>RADIO STREAM</text><rect x='150' y='410' width='300' height='4' fill='url(%23glow)' rx='2'/><text x='300' y='445' font-family='sans-serif' font-weight='700' font-size='15' fill='%239499ad' text-anchor='middle' letter-spacing='3'>ATE • 5-STAR • ROCK-STAR</text></svg>" 
                id="coverImg" class="cover-img" alt="Stray Kids Cover">
         </div>
         <div class="meta-mode" id="modeIndicator">STANDBY // LISTO</div>
@@ -622,7 +625,7 @@
       </div>
 
       <div class="deck-bottom">
-        <!-- CANVAS DEL ECUALIZADOR -->
+        <!-- CANVAS DEL ECUALIZADOR DINÁMICO -->
         <div class="equalizer-canvas-container">
           <canvas id="equalizerCanvas"></canvas>
         </div>
@@ -724,11 +727,10 @@
     const queueBadge = document.getElementById("queueBadge");
     const searchField = document.getElementById("searchField");
 
-    // Portada oficial de Stray Kids (ATE) como imagen base por defecto
-    const DEFAULT_SKZ_COVER = "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/44/e9/87/44e98797-e898-751d-eb83-3c22b936d908/196872134440.jpg/600x600bb.jpg";
+    const DEFAULT_SVG_COVER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231a0308'/><stop offset='50%25' stop-color='%2308090d'/><stop offset='100%25' stop-color='%23020b12'/></linearGradient><linearGradient id='glow' x1='0%25' y1='0%25' x2='100%25' y2='0%25'><stop offset='0%25' stop-color='%23ff003c'/><stop offset='100%25' stop-color='%2300f0ff'/></linearGradient></defs><rect width='600' height='600' fill='url(%23g)'/><circle cx='300' cy='300' r='230' stroke='%23ff003c' stroke-width='3' fill='none' opacity='0.25'/><circle cx='300' cy='300' r='180' stroke='%2300f0ff' stroke-width='2' stroke-dasharray='8 6' fill='none' opacity='0.3'/><path d='M230 200 L370 200 L390 230 L210 230 Z' fill='%23ff003c' opacity='0.8'/><text x='300' y='325' font-family='sans-serif' font-weight='900' font-size='56' fill='%23ffffff' text-anchor='middle' letter-spacing='4'>STRAY KIDS</text><text x='300' y='365' font-family='sans-serif' font-weight='800' font-size='22' fill='url(%23glow)' text-anchor='middle' letter-spacing='10'>RADIO STREAM</text><rect x='150' y='410' width='300' height='4' fill='url(%23glow)' rx='2'/><text x='300' y='445' font-family='sans-serif' font-weight='700' font-size='15' fill='%239499ad' text-anchor='middle' letter-spacing='3'>ATE • 5-STAR • ROCK-STAR</text></svg>";
 
     // -------------------------------------------------------------------------
-    // WEB AUDIO API: ECUALIZADOR REACTIVO CON FÍSICA Y TOPES PICO
+    // WEB AUDIO API: ECUALIZADOR DINÁMICO ULTRA-REACTIVO A FRECUENCIAS
     // -------------------------------------------------------------------------
     const canvas = document.getElementById("equalizerCanvas");
     const ctx = canvas.getContext("2d");
@@ -736,15 +738,18 @@
     let analyser = null;
     let dataArray = null;
 
-    const NUM_BARS = 32;
+    const NUM_BARS = 36;
     const peaks = new Array(NUM_BARS).fill(0);
 
     function initAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 128;
-        analyser.smoothingTimeConstant = 0.68; // Respuesta ágil al ritmo
+        analyser.fftSize = 256;
+        analyser.minDecibels = -85; // Capta detalles sutiles
+        analyser.maxDecibels = -10; // Rompe en los drops
+        analyser.smoothingTimeConstant = 0.55; // Reacción rápida al bombo y ritmo
+
         const source = audioCtx.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioCtx.destination);
@@ -773,9 +778,9 @@
       if (!analyser || !isPlaying) {
         for (let i = 0; i < NUM_BARS; i++) {
           const x = i * (barWidth + barSpacing);
-          const y = canvas.height - 2;
-          ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-          ctx.fillRect(x, y, barWidth, 2);
+          const y = canvas.height - 3;
+          ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.fillRect(x, y, barWidth, 3);
         }
         return;
       }
@@ -783,40 +788,45 @@
       analyser.getByteFrequencyData(dataArray);
 
       for (let i = 0; i < NUM_BARS; i++) {
-        const val = dataArray[i] || 0;
-        let barHeight = (val / 255) * canvas.height * 1.15;
-        barHeight = Math.max(3, Math.min(barHeight, canvas.height));
+        // Mapeo no lineal para darle presencia equilibrada a graves, medios y agudos
+        const binIndex = Math.floor(Math.pow(i / NUM_BARS, 1.4) * (dataArray.length * 0.85));
+        const val = dataArray[binIndex] || 0;
+
+        // Amplificación de movimiento
+        let norm = val / 255;
+        let barHeight = Math.pow(norm, 1.25) * canvas.height * 1.35;
+        barHeight = Math.max(4, Math.min(barHeight, canvas.height));
 
         const x = i * (barWidth + barSpacing);
         const y = canvas.height - barHeight;
 
-        // Físicas de caída de picos
+        // Física rápida de picos reactivos
         if (barHeight >= peaks[i]) {
           peaks[i] = barHeight;
         } else {
-          peaks[i] = Math.max(0, peaks[i] - 1.2);
+          peaks[i] = Math.max(0, peaks[i] - 1.8);
         }
 
         const grad = ctx.createLinearGradient(0, canvas.height, 0, y);
         grad.addColorStop(0, "#ff003c");
-        grad.addColorStop(0.65, "#ff3366");
+        grad.addColorStop(0.55, "#ff2a6d");
         grad.addColorStop(1, "#00f0ff");
 
         ctx.fillStyle = grad;
         ctx.fillRect(x, y, barWidth, barHeight);
 
-        // Tope pico blanco brillante
-        if (peaks[i] > 4) {
+        // Indicador de pico brillante blanco/cian
+        if (peaks[i] > 5) {
           const peakY = canvas.height - peaks[i];
           ctx.fillStyle = "#ffffff";
-          ctx.fillRect(x, peakY - 2, barWidth, 2);
+          ctx.fillRect(x, peakY - 3, barWidth, 2);
         }
       }
     }
     drawEqualizer();
 
     // -------------------------------------------------------------------------
-    // LÓGICA DE TEXTO MARQUEE PING-PONG
+    // TEXTO MARQUEE PING-PONG
     // -------------------------------------------------------------------------
     function updateTitleMarquee(title) {
       trackTitle.textContent = title;
@@ -836,7 +846,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // CARGA Y REPRODUCCIÓN
+    // CARGA DE DATOS Y CATÁLOGO
     // -------------------------------------------------------------------------
     fetch('canciones.json')
       .then(res => res.json())
@@ -872,7 +882,6 @@
       return TRACKS[nextIndex];
     }
 
-    // Búsqueda de la portada oficial del álbum en Apple Music
     function fetchOfficialCover(songTitle) {
       const cleanTitle = songTitle.replace(/[#_\(\)]/g, ' ').replace(/\s+/g, ' ').trim();
       
@@ -890,11 +899,11 @@
             coverCache[cleanTitle] = hiresCover;
             coverImg.src = hiresCover;
           } else {
-            coverImg.src = DEFAULT_SKZ_COVER;
+            coverImg.src = DEFAULT_SVG_COVER;
           }
         })
         .catch(() => {
-          coverImg.src = DEFAULT_SKZ_COVER;
+          coverImg.src = DEFAULT_SVG_COVER;
         });
     }
 
@@ -991,7 +1000,7 @@
     audio.addEventListener("ended", playNext);
 
     // -------------------------------------------------------------------------
-    // LÓGICA DE BARRA DESLIZABLE (DRAG & DROP SCRUBBER)
+    // SCRUBBER DESLIZABLE
     // -------------------------------------------------------------------------
     function updateProgressUI(currentTime, duration) {
       if (!isNaN(duration) && duration > 0) {
