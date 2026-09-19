@@ -167,7 +167,7 @@
       border-radius: 20px;
       object-fit: cover;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      transition: opacity 0.3s ease, transform 0.4s ease, box-shadow 0.4s ease;
     }
 
     .is-playing .cover-img {
@@ -551,7 +551,7 @@
     <section class="player-deck" id="playerDeck">
       <div class="deck-top">
         <div class="cover-wrapper">
-          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80" 
+          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80" 
                id="coverImg" class="cover-img" alt="Cover">
         </div>
         <div class="meta-mode" id="modeIndicator">STANDBY // LISTO</div>
@@ -623,6 +623,7 @@
     let history = [];
     let isPlaying = false;
     let isShuffle = true;
+    const coverCache = {};
 
     const audio = document.getElementById("audioSource");
     const playerDeck = document.getElementById("playerDeck");
@@ -648,20 +649,7 @@
     const queueBadge = document.getElementById("queueBadge");
     const searchField = document.getElementById("searchField");
 
-    // Portadas dinámicas HD por temática para que nunca queden vacías
-    const COVERS = [
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=600&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80"
-    ];
-
-    function getTrackCover(id) {
-      return COVERS[id % COVERS.length];
-    }
+    const DEFAULT_COVER = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80";
 
     // Carga de canciones.json
     fetch('canciones.json')
@@ -698,19 +686,41 @@
       return TRACKS[nextIndex];
     }
 
-    // Limpia y codifica las rutas para archivos con #, espacios, etc.
-    function getCleanAudioSrc(filePath) {
-      let clean = filePath.replace(/^audio[\\\/]/, '');
-      clean = clean.replace('#', '%23');
-      return 'audio/' + encodeURI(clean);
+    // Descarga automática de la carátula oficial vía Apple Music API
+    function fetchOfficialCover(songTitle) {
+      const cleanTitle = songTitle.replace(/[#_\(\)]/g, ' ').replace(/\s+/g, ' ').trim();
+      
+      if (coverCache[cleanTitle]) {
+        coverImg.src = coverCache[cleanTitle];
+        return;
+      }
+
+      const query = encodeURIComponent(`Stray Kids ${cleanTitle}`);
+      fetch(`https://itunes.apple.com/search?term=${query}&media=music&entity=song&limit=1`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.results && data.results.length > 0) {
+            // Obtenemos la carátula en alta definición (600x600 px)
+            const hiresCover = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
+            coverCache[cleanTitle] = hiresCover;
+            coverImg.src = hiresCover;
+          } else {
+            coverImg.src = DEFAULT_COVER;
+          }
+        })
+        .catch(() => {
+          coverImg.src = DEFAULT_COVER;
+        });
     }
 
     function playTrack(track, isFromQueue = false) {
       if (currentTrack) history.push(currentTrack);
       currentTrack = track;
 
-      audio.src = getCleanAudioSrc(track.file);
-      coverImg.src = track.cover || getTrackCover(track.id);
+      // Limpia la ruta para evitar dobles barras o caracteres no codificados
+      let fileName = track.file.replace(/^audio[\\\/]/, '');
+      audio.src = 'audio/' + encodeURIComponent(fileName);
+
       trackTitle.textContent = track.title;
       trackArtist.textContent = `${track.album || 'Stray Kids'} • ${track.artist || 'Stray Kids'}`;
 
@@ -721,6 +731,9 @@
         modeIndicator.textContent = isShuffle ? "AUTO-RADIO ALEATORIO" : "REPRODUCCIÓN CONTINUA";
         modeIndicator.style.color = "var(--accent-cyan)";
       }
+
+      // Buscar y mostrar la carátula oficial
+      fetchOfficialCover(track.title);
 
       audio.play().then(() => {
         setPlaying(true);
@@ -741,7 +754,7 @@
       }
     }
 
-    // Al pedir una canción: si no hay nada sonando, arranca inmediatamente con esa
+    // Al pulsar + PEDIR: si no hay nada sonando, arranca inmediatamente con esa pista
     window.requestSong = function(id) {
       const song = TRACKS.find(t => t.id === id);
       if (!song) return;
@@ -765,7 +778,7 @@
       }
     }
 
-    // Botón Play: si no hay nada cargado, elige una pista aleatoria y empieza ya
+    // Botón Play: si no hay nada cargado, elige aleatorio y arranca al instante
     btnPlay.addEventListener("click", () => {
       if (!currentTrack) {
         playNext();
