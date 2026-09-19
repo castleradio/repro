@@ -691,7 +691,7 @@
     const queueBadge = document.getElementById("queueBadge");
     const searchField = document.getElementById("searchField");
 
-    // Carga de canciones.json
+    // Carga del catálogo desde canciones.json
     fetch('canciones.json')
       .then(res => res.json())
       .then(data => {
@@ -723,8 +723,10 @@
       if (currentTrack) history.push(currentTrack);
       currentTrack = track;
 
-      // encodeURI codifica caracteres conflictivos como # (%23), espacios, etc.
-      audio.src = encodeURI(track.file);
+      // Solución para nombres con # (%23), espacios o caracteres especiales
+      const fileName = track.file.replace(/^audio[\\\/]/, '');
+      audio.src = 'audio/' + encodeURIComponent(fileName);
+
       coverImg.src = track.cover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80";
       trackTitle.textContent = track.title;
       trackArtist.textContent = `${track.album || 'Stray Kids'} • ${track.artist || 'Stray Kids'}`;
