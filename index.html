@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SKZ RADIO • LIVE</title>
+  <title>SKZ RADIO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-focus: rgba(255, 0, 60, 0.4);
       --skz-crimson: #ff003c;
-      --skz-glow: rgba(255, 0, 60, 0.35);
+      --skz-glow: rgba(255, 0, 60, 0.4);
       --accent-cyan: #00f0ff;
       --text-primary: #ffffff;
       --text-secondary: #9499ad;
@@ -41,13 +41,12 @@
 
     body {
       background-image: 
-        radial-gradient(circle at 15% 0%, rgba(255, 0, 60, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 85% 100%, rgba(0, 240, 255, 0.06) 0%, transparent 40%);
+        radial-gradient(circle at 15% 0%, rgba(255, 0, 60, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 85% 100%, rgba(0, 240, 255, 0.08) 0%, transparent 45%);
       display: flex;
       flex-direction: column;
     }
 
-    /* BARRA SUPERIOR */
     .header-bar {
       height: 60px;
       padding: 0 32px;
@@ -55,7 +54,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(8, 9, 13, 0.8);
+      background: rgba(8, 9, 13, 0.85);
       backdrop-filter: blur(16px);
       flex-shrink: 0;
     }
@@ -117,13 +116,12 @@
       50% { opacity: 1; transform: scale(1.3); }
     }
 
-    /* ESPACIO DE TRABAJO EN PC */
     .workspace {
       flex: 1;
       display: grid;
-      grid-template-columns: 460px 1fr;
+      grid-template-columns: 480px 1fr;
       gap: 24px;
-      padding: 24px 32px;
+      padding: 20px 32px 24px 32px;
       height: calc(100vh - 60px);
       min-height: 0;
     }
@@ -134,7 +132,7 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border-subtle);
       border-radius: 24px;
-      padding: 24px 28px;
+      padding: 24px 28px 20px 28px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -150,31 +148,32 @@
       width: 100%;
     }
 
+    /* CARÁTULA GRANDE */
     .cover-wrapper {
-      width: min(230px, 28vh);
-      height: min(230px, 28vh);
-      border-radius: 20px;
-      margin-bottom: 16px;
+      width: min(320px, 36vh);
+      height: min(320px, 36vh);
+      border-radius: 24px;
+      margin-bottom: 14px;
       position: relative;
       background: #141722;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .cover-img {
       width: 100%;
       height: 100%;
-      border-radius: 20px;
+      border-radius: 24px;
       object-fit: cover;
-      border: 1px solid rgba(255, 255, 255, 0.1);
       transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
 
     .is-playing .cover-img {
-      box-shadow: 0 0 30px var(--skz-glow);
+      box-shadow: 0 0 35px var(--skz-glow);
     }
 
     .meta-mode {
@@ -183,13 +182,12 @@
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--accent-cyan);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
-    /* CONTENEDOR MARQUEE CON DESPLAZAMIENTO PING-PONG */
     .title-marquee-container {
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       overflow: hidden;
       position: relative;
       display: flex;
@@ -207,7 +205,6 @@
       will-change: transform;
     }
 
-    /* Animación continua de ida y vuelta */
     .meta-title.animate-marquee {
       animation: pingPongMarquee 10s ease-in-out infinite alternate;
     }
@@ -227,17 +224,17 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
-    /* ECUALIZADOR VISUALIZER FFT */
+    /* ECUALIZADOR DINÁMICO */
     .equalizer-canvas-container {
       width: 100%;
-      height: 38px;
+      height: 52px;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      margin-bottom: -4px;
+      margin-bottom: -2px;
     }
 
     #equalizerCanvas {
@@ -246,18 +243,19 @@
       display: block;
     }
 
+    /* TIMELINE DESLIZABLE (SCRUBBER) */
     .timeline {
       width: 100%;
     }
 
     .progress-track {
       width: 100%;
-      height: 6px;
+      height: 8px;
       background: rgba(255, 255, 255, 0.08);
       border-radius: 10px;
       cursor: pointer;
       position: relative;
-      overflow: hidden;
+      touch-action: none;
     }
 
     .progress-fill {
@@ -265,8 +263,28 @@
       width: 0%;
       background: linear-gradient(90deg, var(--skz-crimson), #ff4d6d);
       border-radius: 10px;
-      box-shadow: 0 0 10px var(--skz-crimson);
-      transition: width 0.1s linear;
+      box-shadow: 0 0 12px var(--skz-crimson);
+      pointer-events: none;
+      position: relative;
+    }
+
+    .progress-thumb {
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--skz-crimson);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .progress-track:hover .progress-thumb,
+    .progress-track.is-dragging .progress-thumb {
+      opacity: 1;
     }
 
     .time-labels {
@@ -579,7 +597,7 @@
   <header class="header-bar">
     <div class="brand">
       <div class="brand-tag">SKZ</div>
-      <div class="brand-name">RADIO <span>LIVE</span></div>
+      <div class="brand-name">RADIO</div>
     </div>
     <div class="live-status">
       <div class="pulse-dot"></div> EN VIVO
@@ -590,29 +608,31 @@
     <section class="player-deck" id="playerDeck">
       <div class="deck-top">
         <div class="cover-wrapper">
-          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80" 
-               id="coverImg" class="cover-img" alt="Cover">
+          <!-- Portada de Stray Kids oficial de bienvenida (ATE) -->
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/44/e9/87/44e98797-e898-751d-eb83-3c22b936d908/196872134440.jpg/600x600bb.jpg" 
+               id="coverImg" class="cover-img" alt="Stray Kids Cover">
         </div>
         <div class="meta-mode" id="modeIndicator">STANDBY // LISTO</div>
         
-        <!-- CONTENEDOR MARQUEE -->
         <div class="title-marquee-container" id="marqueeBox">
           <div class="meta-title" id="trackTitle">Selecciona o pulsa Play</div>
         </div>
 
-        <div class="meta-artist" id="trackArtist">Stray Kids Radio</div>
+        <div class="meta-artist" id="trackArtist">Stray Kids</div>
       </div>
 
       <div class="deck-bottom">
-        <!-- CANVAS DEL ECUALIZADOR FFT -->
+        <!-- CANVAS DEL ECUALIZADOR -->
         <div class="equalizer-canvas-container">
           <canvas id="equalizerCanvas"></canvas>
         </div>
 
-        <!-- LÍNEA DE TIEMPO -->
+        <!-- TIMELINE DESLIZABLE -->
         <div class="timeline">
           <div class="progress-track" id="progressTrack">
-            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-fill" id="progressFill">
+              <div class="progress-thumb"></div>
+            </div>
           </div>
           <div class="time-labels">
             <span id="labelCurrent">0:00</span>
@@ -676,6 +696,7 @@
     let history = [];
     let isPlaying = false;
     let isShuffle = true;
+    let isDragging = false;
     const coverCache = {};
 
     const audio = document.getElementById("audioSource");
@@ -703,10 +724,11 @@
     const queueBadge = document.getElementById("queueBadge");
     const searchField = document.getElementById("searchField");
 
-    const DEFAULT_COVER = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80";
+    // Portada oficial de Stray Kids (ATE) como imagen base por defecto
+    const DEFAULT_SKZ_COVER = "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/44/e9/87/44e98797-e898-751d-eb83-3c22b936d908/196872134440.jpg/600x600bb.jpg";
 
     // -------------------------------------------------------------------------
-    // WEB AUDIO API: ECUALIZADOR FFT
+    // WEB AUDIO API: ECUALIZADOR REACTIVO CON FÍSICA Y TOPES PICO
     // -------------------------------------------------------------------------
     const canvas = document.getElementById("equalizerCanvas");
     const ctx = canvas.getContext("2d");
@@ -714,11 +736,15 @@
     let analyser = null;
     let dataArray = null;
 
+    const NUM_BARS = 32;
+    const peaks = new Array(NUM_BARS).fill(0);
+
     function initAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 64; // 32 bandas de frecuencia nítidas
+        analyser.fftSize = 128;
+        analyser.smoothingTimeConstant = 0.68; // Respuesta ágil al ritmo
         const source = audioCtx.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioCtx.destination);
@@ -740,40 +766,51 @@
       requestAnimationFrame(drawEqualizer);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const totalWidth = canvas.width;
+      const barSpacing = 3;
+      const barWidth = Math.floor((totalWidth - (NUM_BARS - 1) * barSpacing) / NUM_BARS);
+
       if (!analyser || !isPlaying) {
-        // Modo reposo sutil
-        const bars = 24;
-        const totalWidth = canvas.width;
-        const barWidth = Math.floor(totalWidth / bars) - 3;
-        for (let i = 0; i < bars; i++) {
-          const h = 2;
-          const x = i * (barWidth + 3);
-          const y = canvas.height - h;
-          ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-          ctx.fillRect(x, y, barWidth, h);
+        for (let i = 0; i < NUM_BARS; i++) {
+          const x = i * (barWidth + barSpacing);
+          const y = canvas.height - 2;
+          ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+          ctx.fillRect(x, y, barWidth, 2);
         }
         return;
       }
 
       analyser.getByteFrequencyData(dataArray);
 
-      const bars = 24;
-      const totalWidth = canvas.width;
-      const barWidth = Math.floor(totalWidth / bars) - 3;
-
-      for (let i = 0; i < bars; i++) {
+      for (let i = 0; i < NUM_BARS; i++) {
         const val = dataArray[i] || 0;
-        const barHeight = Math.max(3, (val / 255) * canvas.height);
-        const x = i * (barWidth + 3);
+        let barHeight = (val / 255) * canvas.height * 1.15;
+        barHeight = Math.max(3, Math.min(barHeight, canvas.height));
+
+        const x = i * (barWidth + barSpacing);
         const y = canvas.height - barHeight;
 
-        // Degradado reactivo: Carmesí SKZ abajo y Cian Neón arriba
+        // Físicas de caída de picos
+        if (barHeight >= peaks[i]) {
+          peaks[i] = barHeight;
+        } else {
+          peaks[i] = Math.max(0, peaks[i] - 1.2);
+        }
+
         const grad = ctx.createLinearGradient(0, canvas.height, 0, y);
         grad.addColorStop(0, "#ff003c");
+        grad.addColorStop(0.65, "#ff3366");
         grad.addColorStop(1, "#00f0ff");
 
         ctx.fillStyle = grad;
         ctx.fillRect(x, y, barWidth, barHeight);
+
+        // Tope pico blanco brillante
+        if (peaks[i] > 4) {
+          const peakY = canvas.height - peaks[i];
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(x, peakY - 2, barWidth, 2);
+        }
       }
     }
     drawEqualizer();
@@ -835,7 +872,7 @@
       return TRACKS[nextIndex];
     }
 
-    // Descarga de carátula en alta definición vía Apple Music API
+    // Búsqueda de la portada oficial del álbum en Apple Music
     function fetchOfficialCover(songTitle) {
       const cleanTitle = songTitle.replace(/[#_\(\)]/g, ' ').replace(/\s+/g, ' ').trim();
       
@@ -853,11 +890,11 @@
             coverCache[cleanTitle] = hiresCover;
             coverImg.src = hiresCover;
           } else {
-            coverImg.src = DEFAULT_COVER;
+            coverImg.src = DEFAULT_SKZ_COVER;
           }
         })
         .catch(() => {
-          coverImg.src = DEFAULT_COVER;
+          coverImg.src = DEFAULT_SKZ_COVER;
         });
     }
 
@@ -953,22 +990,62 @@
 
     audio.addEventListener("ended", playNext);
 
-    audio.addEventListener("timeupdate", () => {
-      if (!isNaN(audio.duration)) {
-        const pct = (audio.currentTime / audio.duration) * 100;
+    // -------------------------------------------------------------------------
+    // LÓGICA DE BARRA DESLIZABLE (DRAG & DROP SCRUBBER)
+    // -------------------------------------------------------------------------
+    function updateProgressUI(currentTime, duration) {
+      if (!isNaN(duration) && duration > 0) {
+        const pct = (currentTime / duration) * 100;
         progressFill.style.width = `${pct}%`;
-        labelCurrent.textContent = formatTime(audio.currentTime);
-        labelTotal.textContent = formatTime(audio.duration);
+        labelCurrent.textContent = formatTime(currentTime);
+        labelTotal.textContent = formatTime(duration);
+      }
+    }
+
+    audio.addEventListener("timeupdate", () => {
+      if (!isDragging) {
+        updateProgressUI(audio.currentTime, audio.duration);
       }
     });
 
-    progressTrack.addEventListener("click", (e) => {
+    function seekFromEvent(e) {
       const rect = progressTrack.getBoundingClientRect();
-      const pos = (e.clientX - rect.left) / rect.width;
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       if (!isNaN(audio.duration)) {
-        audio.currentTime = pos * audio.duration;
+        const targetTime = pos * audio.duration;
+        updateProgressUI(targetTime, audio.duration);
+        return targetTime;
+      }
+      return 0;
+    }
+
+    progressTrack.addEventListener("pointerdown", (e) => {
+      isDragging = true;
+      progressTrack.classList.add("is-dragging");
+      progressTrack.setPointerCapture(e.pointerId);
+      const targetTime = seekFromEvent(e);
+      audio.currentTime = targetTime;
+    });
+
+    progressTrack.addEventListener("pointermove", (e) => {
+      if (isDragging) {
+        const targetTime = seekFromEvent(e);
+        audio.currentTime = targetTime;
       }
     });
+
+    function stopDragging(e) {
+      if (isDragging) {
+        isDragging = false;
+        progressTrack.classList.remove("is-dragging");
+        try {
+          progressTrack.releasePointerCapture(e.pointerId);
+        } catch (_) {}
+      }
+    }
+
+    progressTrack.addEventListener("pointerup", stopDragging);
+    progressTrack.addEventListener("pointercancel", stopDragging);
 
     volumeControl.addEventListener("input", (e) => {
       audio.volume = e.target.value;
