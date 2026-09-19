@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKZ RADIO • STUDIO DECK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #08090d;
+      --surface-1: rgba(18, 20, 28, 0.75);
+      --surface-2: rgba(28, 32, 45, 0.55);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(255, 0, 60, 0.4);
+      --skz-crimson: #ff003c;
+      --skz-glow: rgba(255, 0, 60, 0.35);
+      --accent-cyan: #00f0ff;
+      --text-primary: #ffffff;
+      --text-secondary: #9499ad;
+      --text-muted: #5a5f73;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-image: 
+        radial-gradient(circle at 15% 0%, rgba(255, 0, 60, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 100%, rgba(0, 240, 255, 0.06) 0%, transparent 40%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-bar {
+      height: 60px;
+      padding: 0 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(8, 9, 13, 0.8);
+      backdrop-filter: blur(16px);
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-tag {
+      background: linear-gradient(135deg, var(--skz-crimson), #990024);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 12px var(--skz-glow);
+    }
+
+    .brand-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-name span {
+      color: var(--skz-crimson);
+    }
+
+    .live-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--skz-crimson);
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--skz-crimson);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--skz-crimson);
+      animation: pulse 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 24px;
+      padding: 24px 32px;
+      height: calc(100vh - 60px);
+      min-height: 0;
+    }
+
+    .player-deck {
+      background: var(--surface-1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .deck-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .cover-wrapper {
+      width: min(240px, 30vh);
+      height: min(240px, 30vh);
+      border-radius: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+    }
+
+    .cover-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .is-playing .cover-img {
+      box-shadow: 0 0 30px var(--skz-glow);
+    }
+
+    .meta-mode {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      margin-bottom: 6px;
+    }
+
+    .meta-title {
+      font-size: 22px;
+      font-weight: 800;
+      text-align: center;
+      max-width: 90%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .meta-artist {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .deck-bottom {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .timeline {
+      width: 100%;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--skz-crimson), #ff4d6d);
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--skz-crimson);
+      transition: width 0.1s linear;
+    }
+
+    .time-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .playback-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .btn-step {
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-step:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-play-hero {
+      background: linear-gradient(135deg, var(--skz-crimson), #e60036);
+      border: none;
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 25px var(--skz-glow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-play-hero:hover {
+      transform: scale(1.04);
+      box-shadow: 0 10px 30px rgba(255, 0, 60, 0.55);
+    }
+
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px;
+    }
+
+    .volume-row span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .volume-slider {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .library-panel {
+      background: var(--surface-1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+
+    .tabs-group {
+      display: flex;
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .tab-item {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-item.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    .tab-pill {
+      background: var(--skz-crimson);
+      color: white;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    .search-field {
+      flex: 1;
+      max-width: 320px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 9px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-field:focus {
+      border-color: var(--border-focus);
+    }
+
+    .list-viewport {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+      padding-right: 6px;
+    }
+
+    .list-viewport::-webkit-scrollbar {
+      width: 5px;
+    }
+    .list-viewport::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    .tracks-grid {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .track-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .track-row:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .row-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .row-index {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 24px;
+    }
+
+    .row-details {
+      overflow: hidden;
+    }
+
+    .row-name {
+      font-weight: 700;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .btn-add-queue {
+      background: rgba(255, 0, 60, 0.12);
+      border: 1px solid rgba(255, 0, 60, 0.3);
+      color: #ff3366;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 7px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-add-queue:hover {
+      background: var(--skz-crimson);
+      border-color: var(--skz-crimson);
+      color: #fff;
+      box-shadow: 0 0 12px var(--skz-glow);
+    }
+
+    #startModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 8, 12, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      cursor: pointer;
+    }
+
+    .modal-box {
+      background: rgba(18, 20, 29, 0.95);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 36px 30px;
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .modal-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--skz-crimson), #80001f);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 25px var(--skz-glow);
+    }
+
+    .modal-btn {
+      width: 100%;
+      background: var(--skz-crimson);
+      border: none;
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px var(--skz-glow);
+    }
+
+    @media (max-width: 960px) {
+      html, body {
+        overflow: auto;
+        height: auto;
+      }
+      .workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 16px;
+        gap: 16px;
+      }
+      .player-deck {
+        height: auto;
+        gap: 20px;
+      }
+      .library-panel {
+        height: 600px;
+      }
+      .panel-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-field {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="startModal">
+    <div class="modal-box">
+      <div class="modal-icon">📻</div>
+      <div>
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700;">SKZ STUDIO DECK</h2>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 6px;">
+          Streaming 24/7 en rotación continua aleatoria y cola de peticiones en tiempo real.
+        </p>
+      </div>
+      <button class="modal-btn">SINTONIZAR RADIO</button>
+    </div>
+  </div>
+
+  <header class="header-bar">
+    <div class="brand">
+      <div class="brand-tag">SKZ</div>
+      <div class="brand-name">STUDIO <span>RADIO</span></div>
+    </div>
+    <div class="live-status">
+      <div class="pulse-dot"></div> EN VIVO • 128 KBPS
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="player-deck" id="playerDeck">
+      <div class="deck-top">
+        <div class="cover-wrapper">
+          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80" 
+               id="coverImg" class="cover-img" alt="Album Art">
+        </div>
+        <div class="meta-mode" id="modeIndicator">AUTO-RADIO ALEATORIO</div>
+        <div class="meta-title" id="trackTitle">Sintonizando...</div>
+        <div class="meta-artist" id="trackArtist">Stray Kids</div>
+      </div>
+
+      <div class="deck-bottom">
+        <div class="timeline">
+          <div class="progress-track" id="progressTrack">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="time-labels">
+            <span id="labelCurrent">0:00</span>
+            <span id="labelTotal">0:00</span>
+          </div>
+        </div>
+
+        <div class="playback-controls">
+          <button class="btn-step" id="btnPrev" title="Anterior">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button class="btn-play-hero" id="btnPlay" title="Reproducir / Pausar">
+            <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button class="btn-step" id="btnNext" title="Siguiente">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+        </div>
+
+        <div class="volume-row">
+          <span>🔈</span>
+          <input type="range" class="volume-slider" id="volumeControl" min="0" max="1" step="0.01" value="0.85">
+          <span>🔊</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="library-panel">
+      <div class="panel-header">
+        <div class="tabs-group">
+          <button class="tab-item active" id="tabCatalog">CATÁLOGO</button>
+          <button class="tab-item" id="tabQueue">COLA <span class="tab-pill" id="queueBadge">0</span></button>
+        </div>
+        <input type="text" class="search-field" id="searchField" placeholder="Buscar por título o disco...">
+      </div>
+
+      <div class="list-viewport">
+        <ul class="tracks-grid" id="catalogView"></ul>
+        <ul class="tracks-grid" id="queueView" style="display: none;"></ul>
+      </div>
+    </section>
+  </main>
+
+  <audio id="audioSource" preload="auto"></audio>
+
+  <script>
+    let TRACKS = [];
+    let currentTrack = null;
+    let queue = [];
+    let history = [];
+    let isPlaying = false;
+
+    const audio = document.getElementById("audioSource");
+    const modal = document.getElementById("startModal");
+    const playerDeck = document.getElementById("playerDeck");
+    const coverImg = document.getElementById("coverImg");
+    const trackTitle = document.getElementById("trackTitle");
+    const trackArtist = document.getElementById("trackArtist");
+    const modeIndicator = document.getElementById("modeIndicator");
+    const progressTrack = document.getElementById("progressTrack");
+    const progressFill = document.getElementById("progressFill");
+    const labelCurrent = document.getElementById("labelCurrent");
+    const labelTotal = document.getElementById("labelTotal");
+    const btnPlay = document.getElementById("btnPlay");
+    const playIcon = document.getElementById("playIcon");
+    const btnNext = document.getElementById("btnNext");
+    const btnPrev = document.getElementById("btnPrev");
+    const volumeControl = document.getElementById("volumeControl");
+
+    const tabCatalog = document.getElementById("tabCatalog");
+    const tabQueue = document.getElementById("tabQueue");
+    const catalogView = document.getElementById("catalogView");
+    const queueView = document.getElementById("queueView");
+    const queueBadge = document.getElementById("queueBadge");
+    const searchField = document.getElementById("searchField");
+
+    // Cargar catálogo desde canciones.json automáticamente
+    fetch('canciones.json')
+      .then(res => res.json())
+      .then(data => {
+        TRACKS = data;
+        renderCatalog();
+      })
+      .catch(err => {
+        console.error("Error al cargar canciones.json:", err);
+        trackTitle.textContent = "Error cargando canciones.json";
+      });
+
+    modal.addEventListener("click", () => {
+      modal.style.opacity = "0";
+      modal.style.transition = "opacity 0.3s ease";
+      setTimeout(() => modal.style.display = "none", 300);
+      if (TRACKS.length > 0) playNext();
+    });
+
+    function getRandomTrack() {
+      if (TRACKS.length === 0) return null;
+      let next;
+      do {
+        next = TRACKS[Math.floor(Math.random() * TRACKS.length)];
+      } while (TRACKS.length > 1 && currentTrack && next.id === currentTrack.id);
+      return next;
+    }
+
+    function playTrack(track, isFromQueue = false) {
+      if (currentTrack) history.push(currentTrack);
+      currentTrack = track;
+
+      audio.src = track.file;
+      coverImg.src = track.cover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80";
+      trackTitle.textContent = track.title;
+      trackArtist.textContent = `${track.album || 'Stray Kids'} • ${track.artist || 'Stray Kids'}`;
+
+      if (isFromQueue) {
+        modeIndicator.textContent = "⚡ PETICIÓN PRIORITARIA";
+        modeIndicator.style.color = "var(--skz-crimson)";
+      } else {
+        modeIndicator.textContent = "AUTO-RADIO ALEATORIO";
+        modeIndicator.style.color = "var(--accent-cyan)";
+      }
+
+      audio.play().then(() => {
+        setPlaying(true);
+      }).catch(err => {
+        console.warn("Autoplay bloqueado:", err);
+      });
+
+      renderQueue();
+    }
+
+    function playNext() {
+      if (queue.length > 0) {
+        const nextInLine = queue.shift();
+        playTrack(nextInLine, true);
+      } else {
+        const randomSong = getRandomTrack();
+        if (randomSong) playTrack(randomSong, false);
+      }
+    }
+
+    window.requestSong = function(id) {
+      const song = TRACKS.find(t => t.id === id);
+      if (!song) return;
+
+      queue.push(song);
+      renderQueue();
+
+      if (audio.paused) {
+        playNext();
+      }
+    };
+
+    function setPlaying(playing) {
+      isPlaying = playing;
+      if (playing) {
+        playerDeck.classList.add("is-playing");
+        playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+      } else {
+        playerDeck.classList.remove("is-playing");
+        playIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
+      }
+    }
+
+    btnPlay.addEventListener("click", () => {
+      if (!currentTrack) {
+        playNext();
+      } else if (audio.paused) {
+        audio.play();
+        setPlaying(true);
+      } else {
+        audio.pause();
+        setPlaying(false);
+      }
+    });
+
+    btnNext.addEventListener("click", playNext);
+
+    btnPrev.addEventListener("click", () => {
+      if (history.length > 0) {
+        const prev = history.pop();
+        playTrack(prev, false);
+      }
+    });
+
+    audio.addEventListener("ended", playNext);
+
+    audio.addEventListener("timeupdate", () => {
+      if (!isNaN(audio.duration)) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progressFill.style.width = `${pct}%`;
+        labelCurrent.textContent = formatTime(audio.currentTime);
+        labelTotal.textContent = formatTime(audio.duration);
+      }
+    });
+
+    progressTrack.addEventListener("click", (e) => {
+      const rect = progressTrack.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      if (!isNaN(audio.duration)) {
+        audio.currentTime = pos * audio.duration;
+      }
+    });
+
+    volumeControl.addEventListener("input", (e) => {
+      audio.volume = e.target.value;
+    });
+
+    function formatTime(s) {
+      const mins = Math.floor(s / 60) || 0;
+      const secs = Math.floor(s % 60) || 0;
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    tabCatalog.addEventListener("click", () => {
+      tabCatalog.classList.add("active");
+      tabQueue.classList.remove("active");
+      catalogView.style.display = "flex";
+      queueView.style.display = "none";
+      searchField.style.display = "block";
+    });
+
+    tabQueue.addEventListener("click", () => {
+      tabQueue.classList.add("active");
+      tabCatalog.classList.remove("active");
+      queueView.style.display = "flex";
+      catalogView.style.display = "none";
+      searchField.style.display = "none";
+    });
+
+    function renderCatalog(filter = "") {
+      catalogView.innerHTML = "";
+      const q = filter.toLowerCase();
+      const filtered = TRACKS.filter(t => t.title.toLowerCase().includes(q) || (t.album && t.album.toLowerCase().includes(q)));
+
+      filtered.forEach((t, idx) => {
+        const li = document.createElement("li");
+        li.className = "track-row";
+        li.innerHTML = `
+          <div class="row-main">
+            <span class="row-index">${(idx + 1).toString().padStart(2, '0')}</span>
+            <div class="row-details">
+              <div class="row-name">${t.title}</div>
+              <div class="row-sub">${t.album || 'Stray Kids'} • ${t.artist || 'Stray Kids'}</div>
+            </div>
+          </div>
+          <button class="btn-add-queue" onclick="requestSong(${t.id})">+ PEDIR</button>
+        `;
+        catalogView.appendChild(li);
+      });
+    }
+
+    function renderQueue() {
+      queueBadge.textContent = queue.length;
+      queueView.innerHTML = "";
+
+      if (queue.length === 0) {
+        queueView.innerHTML = `
+          <li style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px;">
+            No hay canciones en cola.<br>Sonando en modo Auto-Radio continuo aleatorio.
+          </li>
+        `;
+        return;
+      }
+
+      queue.forEach((t, idx) => {
+        const li = document.createElement("li");
+        li.className = "track-row";
+        li.innerHTML = `
+          <div class="row-main">
+            <span class="row-index" style="color: var(--skz-crimson)">#${idx + 1}</span>
+            <div class="row-details">
+              <div class="row-name">${t.title}</div>
+              <div class="row-sub">${t.album || 'Stray Kids'}</div>
+            </div>
+          </div>
+          <span style="font-size: 12px; font-weight: 700; color: var(--skz-crimson); padding-right: 8px;">EN TURNO</span>
+        `;
+        queueView.appendChild(li);
+      });
+    }
+
+    searchField.addEventListener("input", (e) => renderCatalog(e.target.value));
+  </script>
+</body>
+</html>
