@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Librería para extraer carátulas y metadatos ID3 directos de cada MP3 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
   <style>
     :root {
       --bg-main: #08090d;
@@ -153,6 +155,7 @@
       border-radius: 20px;
       margin-bottom: 20px;
       position: relative;
+      background: #12141c;
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
     }
 
@@ -239,7 +242,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 16px;
     }
 
     .btn-step {
@@ -263,6 +266,16 @@
 
     .btn-step:active {
       transform: scale(0.94);
+    }
+
+    .btn-shuffle {
+      color: var(--text-secondary);
+    }
+
+    .btn-shuffle.active {
+      color: var(--accent-cyan);
+      border-color: rgba(0, 240, 255, 0.5);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
     }
 
     .btn-play-hero {
@@ -623,13 +636,22 @@
         </div>
 
         <div class="playback-controls">
+          <!-- BOTÓN ALEATORIO (SHUFFLE) -->
+          <button class="btn-step btn-shuffle active" id="btnShuffle" title="Modo Aleatorio Activo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+            </svg>
+          </button>
+
           <button class="btn-step" id="btnPrev" title="Anterior">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
           </button>
+          
           <button class="btn-play-hero" id="btnPlay" title="Reproducir / Pausar">
             <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           </button>
-          <button class="btn-step" id="btnNext" title="Siguiente">
+          
+          <button class="btn-step" id="btnNext" title="Siguiente canción aleatoria">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
           </button>
         </div>
@@ -666,6 +688,7 @@
     let queue = [];
     let history = [];
     let isPlaying = false;
+    let isShuffle = true; // Activo por defecto: la radio siempre reproduce en aleatorio
 
     const audio = document.getElementById("audioSource");
     const modal = document.getElementById("startModal");
@@ -682,6 +705,7 @@
     const playIcon = document.getElementById("playIcon");
     const btnNext = document.getElementById("btnNext");
     const btnPrev = document.getElementById("btnPrev");
+    const btnShuffle = document.getElementById("btnShuffle");
     const volumeControl = document.getElementById("volumeControl");
 
     const tabCatalog = document.getElementById("tabCatalog");
@@ -690,6 +714,8 @@
     const queueView = document.getElementById("queueView");
     const queueBadge = document.getElementById("queueBadge");
     const searchField = document.getElementById("searchField");
+
+    const DEFAULT_COVER = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80";
 
     // Carga del catálogo desde canciones.json
     fetch('canciones.json')
@@ -703,11 +729,19 @@
         trackTitle.textContent = "Error cargando canciones.json";
       });
 
+    // Entrada inicial con modal
     modal.addEventListener("click", () => {
       modal.style.opacity = "0";
       modal.style.transition = "opacity 0.3s ease";
       setTimeout(() => modal.style.display = "none", 300);
       if (TRACKS.length > 0) playNext();
+    });
+
+    // Toggle de botón Shuffle
+    btnShuffle.addEventListener("click", () => {
+      isShuffle = !isShuffle;
+      btnShuffle.classList.toggle("active", isShuffle);
+      btnShuffle.title = isShuffle ? "Modo Aleatorio Activo" : "Modo Secuencial Activo";
     });
 
     function getRandomTrack() {
@@ -719,15 +753,46 @@
       return next;
     }
 
+    function getNextSequentialTrack() {
+      if (TRACKS.length === 0) return null;
+      if (!currentTrack) return TRACKS[0];
+      const currentIndex = TRACKS.findIndex(t => t.id === currentTrack.id);
+      const nextIndex = (currentIndex + 1) % TRACKS.length;
+      return TRACKS[nextIndex];
+    }
+
+    // Extrae la carátula incrustada (ID3) del MP3 en tiempo real
+    function loadEmbeddedCover(audioUrl) {
+      coverImg.src = DEFAULT_COVER;
+      if (window.jsmediatags) {
+        window.jsmediatags.read(audioUrl, {
+          onSuccess: function(tag) {
+            const image = tag.tags.picture;
+            if (image) {
+              let base64String = "";
+              for (let i = 0; i < image.data.length; i++) {
+                base64String += String.fromCharCode(image.data[i]);
+              }
+              const base64 = "data:" + image.format + ";base64," + window.btoa(base64String);
+              coverImg.src = base64;
+            }
+          },
+          onError: function() {
+            // Si el MP3 no tiene carátula interna, conserva la por defecto
+            coverImg.src = DEFAULT_COVER;
+          }
+        });
+      }
+    }
+
     function playTrack(track, isFromQueue = false) {
       if (currentTrack) history.push(currentTrack);
       currentTrack = track;
 
-      // Solución para nombres con # (%23), espacios o caracteres especiales
       const fileName = track.file.replace(/^audio[\\\/]/, '');
-      audio.src = 'audio/' + encodeURIComponent(fileName);
+      const audioUrl = 'audio/' + encodeURIComponent(fileName);
+      audio.src = audioUrl;
 
-      coverImg.src = track.cover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80";
       trackTitle.textContent = track.title;
       trackArtist.textContent = `${track.album || 'Stray Kids'} • ${track.artist || 'Stray Kids'}`;
 
@@ -735,26 +800,31 @@
         modeIndicator.textContent = "⚡ PETICIÓN PRIORITARIA";
         modeIndicator.style.color = "var(--skz-crimson)";
       } else {
-        modeIndicator.textContent = "AUTO-RADIO ALEATORIO";
+        modeIndicator.textContent = isShuffle ? "AUTO-RADIO ALEATORIO" : "REPRODUCCIÓN CONTINUA";
         modeIndicator.style.color = "var(--accent-cyan)";
       }
+
+      // Lee la carátula real del propio archivo MP3
+      loadEmbeddedCover(audioUrl);
 
       audio.play().then(() => {
         setPlaying(true);
       }).catch(err => {
-        console.warn("Autoplay prevenido o archivo no accesible:", err);
+        console.warn("Autoplay bloqueado o archivo inaccesible:", err);
       });
 
       renderQueue();
     }
 
     function playNext() {
+      // Prioridad 1: Cola de peticiones
       if (queue.length > 0) {
         const nextInLine = queue.shift();
         playTrack(nextInLine, true);
       } else {
-        const randomSong = getRandomTrack();
-        if (randomSong) playTrack(randomSong, false);
+        // Prioridad 2: Modo Aleatorio por defecto (o secuencial si se desactiva)
+        const nextSong = isShuffle ? getRandomTrack() : getNextSequentialTrack();
+        if (nextSong) playTrack(nextSong, false);
       }
     }
 
@@ -781,6 +851,7 @@
       }
     }
 
+    // Al darle Play sin canción activa ni peticiones, arranca aleatorio
     btnPlay.addEventListener("click", () => {
       if (!currentTrack) {
         playNext();
