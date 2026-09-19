@@ -1157,6 +1157,7 @@
     let isPlaying = false;
     let isDragging = false;
     const coverCache = {};
+    const albumCache = {};
 
     const audio = document.getElementById("audioSource");
     const playerDeck = document.getElementById("playerDeck");
@@ -1374,6 +1375,9 @@
       
       if (coverCache[cleanTitle]) {
         coverImg.src = coverCache[cleanTitle];
+        if (albumCache[cleanTitle] && currentTrack) {
+          trackArtist.textContent = `${albumCache[cleanTitle]} • ${currentTrack.artist || 'Stray Kids'}`;
+        }
         return;
       }
 
@@ -1382,9 +1386,18 @@
         .then(res => res.json())
         .then(data => {
           if (data.results && data.results.length > 0) {
-            const hiresCover = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
+            const item = data.results[0];
+            const hiresCover = item.artworkUrl100.replace('100x100bb', '600x600bb');
             coverCache[cleanTitle] = hiresCover;
             coverImg.src = hiresCover;
+
+            // Extraer y mostrar el nombre oficial del álbum (ej: ATE, 5-STAR, ROCK-STAR, NOEASY)
+            if (item.collectionName) {
+              albumCache[cleanTitle] = item.collectionName;
+              if (currentTrack && currentTrack.title === songTitle) {
+                trackArtist.textContent = `${item.collectionName} • ${currentTrack.artist || 'Stray Kids'}`;
+              }
+            }
           } else {
             coverImg.src = DEFAULT_SVG_COVER;
           }
@@ -1410,7 +1423,11 @@
       audio.src = audioBase + encodeURIComponent(fileName);
 
       updateTitleMarquee(track.title);
-      trackArtist.textContent = `${track.album || 'Stray Kids'} • ${track.artist || 'Stray Kids'}`;
+
+      // Si ya tenemos el álbum oficial en caché lo usamos; si no, muestra el inicial mientras consulta
+      const cleanTitle = track.title.replace(/[#_\(\)]/g, ' ').replace(/\s+/g, ' ').trim();
+      const currentAlbum = albumCache[cleanTitle] || track.album || 'Stray Kids';
+      trackArtist.textContent = `${currentAlbum} • ${track.artist || 'Stray Kids'}`;
 
       if (isFromQueue) {
         modeIndicator.textContent = "⚡ PETICIÓN PRIORITARIA";
